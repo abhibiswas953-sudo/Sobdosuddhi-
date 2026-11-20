@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#255D47" />
+      <stop offset="100%" stop-color="#163B2D" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)" />
+  <!-- Subtle archival inner frame -->
+  <rect x="44" y="44" width="424" height="424" rx="82" fill="none" stroke="#9DD4BD" stroke-opacity="0.22" stroke-width="4" />
+  <!-- Editorial Fountain Pen Nib + Manuscript Page Motif -->
+  <path d="M256 108 L342 254 L298 372 L214 372 L170 254 Z" fill="#F8F7F4" />
+  <path d="M256 108 L256 266" stroke="#1E4D3B" stroke-width="10" stroke-linecap="round" />
+  <circle cx="256" cy="272" r="20" fill="#1E4D3B" />
+  <rect x="202" y="384" width="108" height="22" rx="11" fill="#C9A86A" />
+</svg>

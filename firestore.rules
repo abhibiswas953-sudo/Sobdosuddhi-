@@ -1,0 +1,329 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ---------------------------------------------------------
+    // Global Hardened Primitives
+    // ---------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // ---------------------------------------------------------
+    // Validation Blueprint: UserProfile
+    // ---------------------------------------------------------
+    function isValidUserProfile(data) {
+      return data.keys().hasAll([
+          'uid',
+          'displayName',
+          'email',
+          'spellingStandard',
+          'literaryStrictness',
+          'preservePoeticLicense',
+          'preserveRegionalDialects',
+          'autoSave',
+          'darkMode',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'uid',
+          'displayName',
+          'email',
+          'photoURL',
+          'spellingStandard',
+          'literaryStrictness',
+          'preservePoeticLicense',
+          'preserveRegionalDialects',
+          'autoSave',
+          'darkMode',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        isValidId(data.uid) &&
+        data.uid == request.auth.uid &&
+        data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 120 &&
+        data.email is string && data.email.size() >= 3 && data.email.size() <= 200 &&
+        (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500)) &&
+        data.spellingStandard in ['bangla_academy', 'paschimbanga_academy', 'rabindrik_sahitya'] &&
+        data.literaryStrictness in ['conservative', 'balanced', 'thorough'] &&
+        data.preservePoeticLicense is bool &&
+        data.preserveRegionalDialects is bool &&
+        data.autoSave is bool &&
+        data.darkMode is bool &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // ---------------------------------------------------------
+    // Validation Blueprint: Manuscript
+    // ---------------------------------------------------------
+    function isValidManuscript(data) {
+      return data.keys().hasAll([
+          'ownerId',
+          'title',
+          'category',
+          'originalText',
+          'content',
+          'wordCount',
+          'charCount',
+          'errorsFound',
+          'errorsResolved',
+          'status',
+          'issues',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'title',
+          'category',
+          'originalText',
+          'content',
+          'wordCount',
+          'charCount',
+          'errorsFound',
+          'errorsResolved',
+          'status',
+          'issues',
+          'sourceFileName',
+          'createdAt',
+          'updatedAt'
+        ]) &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+        data.category in ['কবিতা', 'গল্প', 'উপন্যাস', 'প্রবন্ধ', 'অন্যান্য'] &&
+        data.originalText is string && data.originalText.size() <= 100000 &&
+        data.content is string && data.content.size() <= 100000 &&
+        data.wordCount is int && data.wordCount >= 0 && data.wordCount <= 100000 &&
+        data.charCount is int && data.charCount >= 0 && data.charCount <= 100000 &&
+        data.errorsFound is int && data.errorsFound >= 0 && data.errorsFound <= 10000 &&
+        data.errorsResolved is int && data.errorsResolved >= 0 && data.errorsResolved <= 10000 &&
+        data.status in ['খসড়া', 'প্রুফরিড সম্পন্ন', 'সুরক্ষিত'] &&
+        data.issues is list && data.issues.size() <= 200 &&
+        (data.issues.size() == 0 || data.issues[0] is map) &&
+        (!('sourceFileName' in data) || (data.sourceFileName is string && data.sourceFileName.size() <= 255)) &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    // ---------------------------------------------------------
+    // Validation Blueprint: ProofreadRevision
+    // ---------------------------------------------------------
+    function isValidRevision(data, manuscriptId) {
+      return data.keys().hasAll([
+          'ownerId',
+          'manuscriptId',
+          'chapterTitle',
+          'originalText',
+          'correctedText',
+          'wordCount',
+          'issuesCount',
+          'acceptedCount',
+          'rejectedCount',
+          'note',
+          'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'ownerId',
+          'manuscriptId',
+          'chapterTitle',
+          'originalText',
+          'correctedText',
+          'wordCount',
+          'issuesCount',
+          'acceptedCount',
+          'rejectedCount',
+          'note',
+          'createdAt'
+        ]) &&
+        isValidId(data.ownerId) &&
+        data.ownerId == request.auth.uid &&
+        isValidId(data.manuscriptId) &&
+        data.manuscriptId == manuscriptId &&
+        data.chapterTitle is string && data.chapterTitle.size() >= 1 && data.chapterTitle.size() <= 200 &&
+        data.originalText is string && data.originalText.size() <= 100000 &&
+        data.correctedText is string && data.correctedText.size() <= 100000 &&
+        data.wordCount is int && data.wordCount >= 0 && data.wordCount <= 100000 &&
+        data.issuesCount is int && data.issuesCount >= 0 && data.issuesCount <= 10000 &&
+        data.acceptedCount is int && data.acceptedCount >= 0 && data.acceptedCount <= 10000 &&
+        data.rejectedCount is int && data.rejectedCount >= 0 && data.rejectedCount <= 10000 &&
+        data.note is string && data.note.size() <= 500 &&
+        data.createdAt is timestamp;
+    }
+
+    // ---------------------------------------------------------
+    // Collection: /users/{userId} (PII Isolated, Owner Only)
+    // ---------------------------------------------------------
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && isOwner(userId);
+      allow list: if false;
+
+      allow create: if isVerifiedUser() &&
+        isValidId(userId) &&
+        isOwner(userId) &&
+        isValidUserProfile(incoming()) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+
+      allow update: if isVerifiedUser() &&
+        isValidId(userId) &&
+        isOwner(userId) &&
+        isValidUserProfile(incoming()) &&
+        incoming().uid == existing().uid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        (
+          // Action: Update Profile Metadata
+          incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'updatedAt']) ||
+          // Action: Update Proofreading & Editorial Preferences
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'spellingStandard',
+            'literaryStrictness',
+            'preservePoeticLicense',
+            'preserveRegionalDialects',
+            'autoSave',
+            'darkMode',
+            'updatedAt'
+          ]) ||
+          // Action: Full Preferences & Profile Sync
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'displayName',
+            'photoURL',
+            'spellingStandard',
+            'literaryStrictness',
+            'preservePoeticLicense',
+            'preserveRegionalDialects',
+            'autoSave',
+            'darkMode',
+            'updatedAt'
+          ])
+        );
+
+      allow delete: if isVerifiedUser() && isValidId(userId) && isOwner(userId);
+    }
+
+    // ---------------------------------------------------------
+    // Collection: /manuscripts/{manuscriptId} (Owner Only)
+    // ---------------------------------------------------------
+    match /manuscripts/{manuscriptId} {
+      allow get: if isSignedIn() && isValidId(manuscriptId) && existing().ownerId == request.auth.uid;
+      allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+
+      allow create: if isVerifiedUser() &&
+        isValidId(manuscriptId) &&
+        isValidManuscript(incoming()) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        exists(/databases/$(database)/documents/users/$(request.auth.uid));
+
+      allow update: if isVerifiedUser() &&
+        isValidId(manuscriptId) &&
+        isValidManuscript(incoming()) &&
+        existing().ownerId == request.auth.uid &&
+        existing().status != 'সুরক্ষিত' &&
+        incoming().ownerId == existing().ownerId &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        (
+          // Action: Edit Manuscript Metadata & Content
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'title',
+            'category',
+            'content',
+            'wordCount',
+            'charCount',
+            'sourceFileName',
+            'updatedAt'
+          ]) ||
+          // Action: Apply Proofreading Results & Resolve Issues
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'content',
+            'wordCount',
+            'charCount',
+            'errorsFound',
+            'errorsResolved',
+            'issues',
+            'status',
+            'updatedAt'
+          ]) ||
+          // Action: Combined Editor Save & Proofreading Sync
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'title',
+            'category',
+            'originalText',
+            'content',
+            'wordCount',
+            'charCount',
+            'errorsFound',
+            'errorsResolved',
+            'issues',
+            'status',
+            'sourceFileName',
+            'updatedAt'
+          ]) ||
+          // Action: Lock Final Manuscript (Terminal State)
+          (
+            incoming().status == 'সুরক্ষিত' &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['status', 'updatedAt'])
+          )
+        );
+
+      allow delete: if isVerifiedUser() && isValidId(manuscriptId) && existing().ownerId == request.auth.uid;
+
+      // ---------------------------------------------------------
+      // Subcollection: /manuscripts/{manuscriptId}/revisions/{revisionId}
+      // ---------------------------------------------------------
+      match /revisions/{revisionId} {
+        allow get: if isSignedIn() &&
+          isValidId(manuscriptId) &&
+          isValidId(revisionId) &&
+          existing().ownerId == request.auth.uid &&
+          get(/databases/$(database)/documents/manuscripts/$(manuscriptId)).data.ownerId == request.auth.uid;
+
+        allow list: if isSignedIn() && existing().ownerId == request.auth.uid;
+
+        allow create: if isVerifiedUser() &&
+          isValidId(manuscriptId) &&
+          isValidId(revisionId) &&
+          isValidRevision(incoming(), manuscriptId) &&
+          incoming().createdAt == request.time &&
+          get(/databases/$(database)/documents/manuscripts/$(manuscriptId)).data.ownerId == request.auth.uid;
+
+        allow update: if false;
+
+        allow delete: if isVerifiedUser() &&
+          isValidId(manuscriptId) &&
+          isValidId(revisionId) &&
+          existing().ownerId == request.auth.uid &&
+          get(/databases/$(database)/documents/manuscripts/$(manuscriptId)).data.ownerId == request.auth.uid;
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+-keep class com.sobdosuddhi.app.** { *; }
+-dontwarn io.flutter.embedding.**

@@ -1,0 +1,288 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Private user account profile and Bengali proofreading preferences for a Sobdosuddhi.1.0 author.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Firebase Auth UID matching the document ID."
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 120,
+          "minLength": 1,
+          "description": "Author display name."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 200,
+          "minLength": 3,
+          "description": "Private account email address."
+        },
+        "photoURL": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Optional profile avatar URL."
+        },
+        "spellingStandard": {
+          "type": "string",
+          "enum": [
+            "bangla_academy",
+            "paschimbanga_academy",
+            "rabindrik_sahitya"
+          ],
+          "description": "Preferred Bengali orthography standard."
+        },
+        "literaryStrictness": {
+          "type": "string",
+          "enum": [
+            "conservative",
+            "balanced",
+            "thorough"
+          ],
+          "description": "AI suggestion sensitivity level."
+        },
+        "preservePoeticLicense": {
+          "type": "boolean",
+          "description": "Protect poetic license, rhythm, and deliberate metaphors."
+        },
+        "preserveRegionalDialects": {
+          "type": "boolean",
+          "description": "Recognize and preserve regional Bengali expressions."
+        },
+        "autoSave": {
+          "type": "boolean",
+          "description": "Automatically persist manuscript edits."
+        },
+        "darkMode": {
+          "type": "boolean",
+          "description": "User dark mode interface preference."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of profile creation."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of latest update."
+        }
+      },
+      "required": [
+        "uid",
+        "displayName",
+        "email",
+        "spellingStandard",
+        "literaryStrictness",
+        "preservePoeticLicense",
+        "preserveRegionalDialects",
+        "autoSave",
+        "darkMode",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Manuscript": {
+      "title": "Manuscript",
+      "description": "Private Bengali literary manuscript with original snapshot, editable text, and AI proofreading annotations.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Owner Firebase Auth UID."
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 200,
+          "minLength": 1,
+          "description": "Manuscript title."
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "কবিতা",
+            "গল্প",
+            "উপন্যাস",
+            "প্রবন্ধ",
+            "অন্যান্য"
+          ],
+          "description": "Literary genre category in Bengali."
+        },
+        "originalText": {
+          "type": "string",
+          "maxLength": 100000,
+          "description": "Original manuscript text preserved for comparison and download."
+        },
+        "content": {
+          "type": "string",
+          "maxLength": 100000,
+          "description": "Current edited and corrected manuscript Unicode content."
+        },
+        "wordCount": {
+          "type": "integer",
+          "description": "Total Bengali/Unicode word count."
+        },
+        "charCount": {
+          "type": "integer",
+          "description": "Total Unicode character count."
+        },
+        "errorsFound": {
+          "type": "integer",
+          "description": "Total detected proofreading issues."
+        },
+        "errorsResolved": {
+          "type": "integer",
+          "description": "Total accepted or rejected issues."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "খসড়া",
+            "প্রুফরিড সম্পন্ন",
+            "সুরক্ষিত"
+          ],
+          "description": "Editorial workflow state; সুরক্ষিত is a terminal locked state."
+        },
+        "issues": {
+          "type": "array",
+          "description": "Bounded list (max 200) of structured AI proofreading suggestion objects."
+        },
+        "sourceFileName": {
+          "type": "string",
+          "maxLength": 255,
+          "description": "Optional filename when imported from DOCX or TXT."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last-modified timestamp."
+        }
+      },
+      "required": [
+        "ownerId",
+        "title",
+        "category",
+        "originalText",
+        "content",
+        "wordCount",
+        "charCount",
+        "errorsFound",
+        "errorsResolved",
+        "status",
+        "issues",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ProofreadRevision": {
+      "title": "ProofreadRevision",
+      "description": "Historical proofreading revision snapshot belonging to a manuscript.",
+      "type": "object",
+      "properties": {
+        "ownerId": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Owner UID matching parent manuscript ownerId."
+        },
+        "manuscriptId": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[a-zA-Z0-9_\\-]+$",
+          "description": "Parent manuscript document ID."
+        },
+        "chapterTitle": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Chapter title or full manuscript label."
+        },
+        "originalText": {
+          "type": "string",
+          "maxLength": 100000,
+          "description": "Text prior to proofreading."
+        },
+        "correctedText": {
+          "type": "string",
+          "maxLength": 100000,
+          "description": "Text snapshot after review."
+        },
+        "wordCount": {
+          "type": "integer",
+          "description": "Word count checked in this revision."
+        },
+        "issuesCount": {
+          "type": "integer",
+          "description": "Total issues detected."
+        },
+        "acceptedCount": {
+          "type": "integer",
+          "description": "Issues accepted by author."
+        },
+        "rejectedCount": {
+          "type": "integer",
+          "description": "Issues rejected by author."
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Short summary note in Bengali."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of revision creation."
+        }
+      },
+      "required": [
+        "ownerId",
+        "manuscriptId",
+        "chapterTitle",
+        "originalText",
+        "correctedText",
+        "wordCount",
+        "issuesCount",
+        "acceptedCount",
+        "rejectedCount",
+        "note",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Owner-only private author profile, PII email, and proofreading preferences."
+    },
+    "/manuscripts/{manuscriptId}": {
+      "schema": {
+        "$ref": "#/entities/Manuscript"
+      },
+      "description": "Owner-only private Bengali manuscripts and active proofreading annotations."
+    },
+    "/manuscripts/{manuscriptId}/revisions/{revisionId}": {
+      "schema": {
+        "$ref": "#/entities/ProofreadRevision"
+      },
+      "description": "Immutable proofreading history snapshots scoped under each manuscript."
+    }
+  }
+}

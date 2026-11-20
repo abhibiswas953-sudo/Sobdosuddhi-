@@ -1,0 +1,8 @@
+{
+  "name": "Sobdosuddhi.1.0",
+  "description": "শুদ্ধ শব্দে, সুন্দর সাহিত্য — বাংলা কবি, গল্পকার, ঔপন্যাসিক ও সম্পাদকদের জন্য এআই-চালিত আধুনিক পান্ডুলিপি প্রুফরিডিং প্ল্যাটফর্ম।",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

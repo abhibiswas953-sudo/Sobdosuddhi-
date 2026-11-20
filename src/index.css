@@ -1,0 +1,178 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --font-serif-bn: 'Noto Serif Bengali', Georgia, serif;
+    --font-sans-bn: 'Hind Siliguri', system-ui, -apple-system, sans-serif;
+    --font-mono-num: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    -webkit-tap-highlight-color: transparent;
+    font-family: var(--font-sans-bn);
+  }
+
+  body {
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+}
+
+.font-literary {
+  font-family: var(--font-serif-bn);
+}
+
+.font-ui {
+  font-family: var(--font-sans-bn);
+}
+
+.font-numeric {
+  font-family: var(--font-mono-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Native safe-area padding for notched Android & iOS screens */
+.pb-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Native app scroll area without visible ugly scrollbars on mobile */
+.app-scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.app-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.app-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-scroll::-webkit-scrollbar-thumb {
+  background: rgba(28, 33, 30, 0.14);
+  border-radius: 9999px;
+}
+
+.dark .app-scroll::-webkit-scrollbar-thumb {
+  background: rgba(236, 235, 230, 0.16);
+}
+
+/* Material 3 Screen & Bottom Sheet Animations */
+@keyframes m3ScreenEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes m3SheetUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-m3-screen {
+  animation: m3ScreenEnter 180ms cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+.animate-m3-sheet {
+  animation: m3SheetUp 220ms cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-m3-screen,
+  .animate-m3-sheet {
+    animation: none;
+  }
+}
+
+/* Editorial underline markers for proofreading severity */
+.mark-definite {
+  background-color: rgba(220, 38, 38, 0.14);
+  border-bottom: 2px solid #dc2626;
+  border-radius: 3px;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.dark .mark-definite {
+  background-color: rgba(248, 113, 113, 0.22);
+  border-bottom-color: #f87171;
+}
+
+.mark-definite-active {
+  background-color: rgba(220, 38, 38, 0.28);
+}
+
+.mark-warning {
+  background-color: rgba(217, 119, 6, 0.15);
+  border-bottom: 2px solid #d97706;
+  border-radius: 3px;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.dark .mark-warning {
+  background-color: rgba(251, 191, 36, 0.22);
+  border-bottom-color: #fbbf24;
+}
+
+.mark-warning-active {
+  background-color: rgba(217, 119, 6, 0.28);
+}
+
+.mark-style {
+  background-color: rgba(37, 99, 235, 0.13);
+  border-bottom: 2px solid #2563eb;
+  border-radius: 3px;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.dark .mark-style {
+  background-color: rgba(96, 165, 250, 0.22);
+  border-bottom-color: #60a5fa;
+}
+
+.mark-style-active {
+  background-color: rgba(37, 99, 235, 0.26);
+}
+
+.mark-corrected {
+  background-color: rgba(30, 77, 59, 0.16);
+  border-bottom: 2px solid #1e4d3b;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.dark .mark-corrected {
+  background-color: rgba(92, 180, 144, 0.22);
+  border-bottom-color: #5cb490;
+}

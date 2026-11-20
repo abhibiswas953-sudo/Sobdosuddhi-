@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="mbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#255D47" />
+      <stop offset="100%" stop-color="#163B2D" />
+    </linearGradient>
+  </defs>
+  <!-- Full-bleed solid background for Android maskable safe zone (15% padding) -->
+  <rect width="512" height="512" fill="url(#mbg)" />
+  <g transform="translate(51.2, 51.2) scale(0.8)">
+    <path d="M256 108 L342 254 L298 372 L214 372 L170 254 Z" fill="#F8F7F4" />
+    <path d="M256 108 L256 266" stroke="#1E4D3B" stroke-width="10" stroke-linecap="round" />
+    <circle cx="256" cy="272" r="20" fill="#1E4D3B" />
+    <rect x="202" y="384" width="108" height="22" rx="11" fill="#C9A86A" />
+  </g>
+</svg>
